@@ -17,7 +17,7 @@ int main() {
     } else if (x > 0 && x <= R) {
         y = sqrt(pow(R, 2) - pow(x, 2));
     } else {
-        y = -x * R;
+        y = -x + R;
     }
 
     cout << "y = " << y << endl;

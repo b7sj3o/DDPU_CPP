@@ -11,9 +11,19 @@ int main() {
     cout << "c = "; cin >> c;
     
 
-    if (x < 0.6 && (b+c != 0)) F  = a*(pow(x, 2)) + b*x + c;
+    if (x < 0.6 && (b+c != 0)) F = a*(pow(x, 2)) + b*x + c;
     else if (x > 0.6 && (b+c == 0)) F = (x-a) / (x-c);
     else F = (x/c) + (x/a);
+
+    cout << "F = " << F << endl;
+
+    if (x < 0.6 && (b+c != 0)) {
+        F = a*(pow(x, 2)) + b*x + c;
+    } else if (x > 0.6 && (b+c == 0)) {
+         F = (x-a) / (x-c);
+    } else {
+        F = (x/c) + (x/a);
+    }
 
     cout << "F = " << F << endl;
 
