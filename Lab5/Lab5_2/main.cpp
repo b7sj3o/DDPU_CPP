@@ -1,23 +1,57 @@
 #include <iostream>
+#include <iomanip>
 #include <cmath>
 
 using namespace std;
 
-double function(const double x, const double y, const double c);
-
-int main()
-{
-	double x, y;
-
-	cout << "x = "; cin >> x;
-	cout << "y = "; cin >> y;
-
-	double result = (function(x * y, pow(x, 2), pow(y, 2)) - pow(function(1, x, y), 2)) / 1 + function(sqrt(x), pow(y, 2), 1);
-	cout << "result = " << result << endl;
-	return 0;
+double A(double x, int n, double prevTerm) {
+	double term = pow(-1, n+1) / ( (2*n+1) * pow(x, 2*n+1));
+    return term;
 }
 
-double function(const double a, const double b, const double c)
-{
-	return pow(a,2) + pow(b, 2) + pow(c, 2);
+double S(double x, double eps, int &termCount) {
+    double sum = -M_PI_2; 
+    double term = -1 / x;
+    termCount = 1;
+
+    sum += term;
+
+    while (fabs(term) > eps) {
+        term = A(x, termCount, term);
+        sum += term;
+        termCount++;
+    }
+
+    return sum;
+}
+
+int main() {
+    double x1, x2, dx, eps;
+
+    // Введення параметрів
+    cout << "x1 = "; cin >> x1;
+    cout << "x2 = "; cin >> x2;
+    cout << "dx = "; cin >> dx;
+    cout << "eps = "; cin >> eps;
+
+	// header
+    cout << setw(10) << "x" 
+         << setw(20) << "arctg(x)" 
+         << setw(20) << "Sum" 
+         << setw(10) << "Terms" << endl;
+    cout << string(60, '-') << endl;
+
+    for (double x = x1; x <= x2; x += dx) {
+        int termCount = 0; // Кількість членів ряду
+        double seriesSum = S(x, eps, termCount);
+        double trueValue = atan(x); // Реальне значення arctg(x)
+
+        // Виведення результату
+        cout << setw(10) << fixed << setprecision(4) << x 
+             << setw(20) << trueValue 
+             << setw(20) << seriesSum 
+             << setw(10) << termCount << endl;
+    }
+
+    return 0;
 }

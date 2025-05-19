@@ -1,46 +1,57 @@
 #include <iostream>
 #include <cmath>
 #include <iomanip>
-#include <time.h>
+#include <ctime>
 
 using namespace std;
 
-int main() {
-	double x, y, R;
+bool isInsideTarget(double x, double y, double R) {
+	// верхнє праве коло
+    if (x <= 0 && y >= 0 && x * x + y * y <= R * R) {
+        return true;
+    }
 
-	srand((unsigned)time(NULL));
+    if (x >= 0 && y <= 0 && x * x + y * y <= R * R) {
+        return true;
+    }
 
-	cout << "R = "; cin >> R;
-
-	for (int i = 0; i < 10; i++) {
-		cout << "x = "; cin >> x;
-		cout << "y = "; cin >> y;
-
-		if (
-            pow((x + R), 2) + pow((y - R), 2) <= pow(R, 2) ||
-            y <= 0 && y >= -R && x >= 0 && x <= 2 * R) 
-            {
-                cout << "true" << endl;
-            } else {
-                cout << "false" << endl;
-            }
-	}
-	cout << endl << fixed;
-
-	for (int i = 0; i < 10; i++) {
-		x = 2 * R + rand() * (- 2 * R - 2 * R) / RAND_MAX;
-		y = 2 * R + rand() * (-2 * R - 2 * R) / RAND_MAX;
-        
-		if (
-            pow((x + R), 2) + pow((y - R), 2) <= pow(R, 2) ||
-		    y <= 0 && y >= -R && x >= 0 && x <= 2 * R)
-            {
-                cout << setw(8) << setprecision(4) << x << " "
-			    << setw(8) << setprecision(4) << y << " " << "yes" << endl;
-            } else {
-                cout << setw(8) << setprecision(4) << x << " "
-                << setw(8) << setprecision(4) << y << " " << "no" << endl;
-            }
-	}
-	return 0;
+    return false;
 }
+
+int main() {
+    double x, y, R;
+
+    srand(static_cast<unsigned>(time(NULL)));
+
+    cout << "R = : "; cin >> R;
+
+    // 1 спосіб
+    cout << "Перший спосіб:" << endl;
+    for (int i = 0; i < 10; i++) {
+        cout << "x = "; cin >> x;
+        cout << "y = "; cin >> y;
+
+        if (isInsideTarget(x, y, R)) {
+            cout << "Зачіпило" << endl;
+        } else {
+            cout << "Не зачіпило" << endl;
+        }
+    }
+
+    // 2 спосіб:
+    cout << "Випадкові точки:" << endl;
+    for (int i = 0; i < 10; i++) {
+        x = 2 * R + rand() * (- 2 * R - 2 * R) / RAND_MAX;
+		y = 2 * R + rand() * (-2 * R - 2 * R) / RAND_MAX;
+
+        cout << fixed << setprecision(4) << "Point (" << x << ", " << y << "): ";
+        if (isInsideTarget(x, y, R)) {
+            cout << "Зачіпило" << endl;
+        } else {
+            cout << "Не зачіпило" << endl;
+        }
+    }
+
+    return 0;
+}
+

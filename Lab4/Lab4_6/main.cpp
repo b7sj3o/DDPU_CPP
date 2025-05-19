@@ -58,7 +58,7 @@ int main() {
 	for (n = 20; n >= 1; n--) {
 		S = 0;
 		
-		for (k = n; k >= 1; k--) {
+		for (k = n; k <= 20; k++) {
 			S += (pow(k, 2));
 		}
 
