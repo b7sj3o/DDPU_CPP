@@ -1,114 +1,157 @@
-// Lab_7_1.cpp
-// Федитник Віталій
-// Лабораторна робота № 7.1.
-// Пошук заданих елементів та впорядкування рядків / стовпчиків матриці.
-// Варіант 20
-
-
 #include <iostream>
 #include <iomanip>
+#include <cstdlib>
 #include <ctime>
+
 using namespace std;
 
-void Create(int** a, const int rowCount, const int colCount, const int Low, const int High);
-void Print(int** a, const int rowCount, const int colCount);
-void Sort(int** a, const int rowCount, const int colCount);
-void Change(int** a, const int row1, const int row2, const int colCount);
-void Calc(int** a, const int rowCount, const int colCount, int& S, int& k);
+const int rowCount = 8;
+const int colCount = 6;
+const int Low = -26;
+const int High = 23;
 
-int main()
-{
+void generateRandomMatrix(int matrix[rowCount][colCount]);
+void printMatrix(const int matrix[rowCount][colCount], const char* title);
+bool meetsCriterion(int value);
+int countElementsMeetingCriterion(const int matrix[rowCount][colCount]);
+int sumElementsMeetingCriterion(const int matrix[rowCount][colCount]);
+void replaceElementsMeetingCriterionWithZeros(int matrix[rowCount][colCount]);
+void sortMatrix(int matrix[rowCount][colCount]);
+void copyMatrix(const int source[rowCount][colCount], int destination[rowCount][colCount]);
+
+int main() {
     srand((unsigned)time(NULL));
-
-    const int Low = 11;
-    const int High = 74;
-    const int rowCount = 8;
-    const int colCount = 9;
-
-    int** a = new int*[rowCount];
-    for (int i = 0; i < rowCount; i++)
-        a[i] = new int[colCount];
-
-    Create(a, rowCount, colCount, Low, High);
-    cout << "Initial matrix:" << endl;
-    Print(a, rowCount, colCount);
-
-    Sort(a, rowCount, colCount);
-    cout << "Sorted matrix:" << endl;
-    Print(a, rowCount, colCount);
-
-    int S = 0, k = 0;
-    Calc(a, rowCount, colCount, S, k);
-    cout << "Sum of elements that adjusts the condition: S = " << S << endl;
-    cout << "Amount of those elements: k = " << k << endl;
-
-    cout << "Matrix after reseting elements:" << endl;
-    Print(a, rowCount, colCount);
-
-    for (int i = 0; i < rowCount; i++)
-        delete[] a[i];
-    delete[] a;
-
+    
+    int matrix[rowCount][colCount] = {};
+    
+    generateRandomMatrix(matrix);
+    printMatrix(matrix, "Original matrix");
+    
+    // Task 1
+    int count = countElementsMeetingCriterion(matrix);
+    int sum = sumElementsMeetingCriterion(matrix);
+    
+    cout << "Number of elements meeting the criterion (all except positive even): " << count << "/" << rowCount*colCount << "\n";
+    cout << "Sum of elements meeting the criterion: " << sum << "\n\n";
+    
+    int modifiedMatrix[rowCount][colCount];
+    copyMatrix(matrix, modifiedMatrix);
+    replaceElementsMeetingCriterionWithZeros(modifiedMatrix);
+    printMatrix(modifiedMatrix, "Matrix with elements meeting the criterion replaced with zeros");
+    
+    // Task 2
+    int sortedMatrix[rowCount][colCount];
+    copyMatrix(matrix, sortedMatrix);
+    sortMatrix(sortedMatrix);
+    printMatrix(sortedMatrix, "Sorted matrix (by columns)");
     return 0;
 }
 
-void Create(int** a, const int rowCount, const int colCount, const int Low, const int High)
-{
+
+void generateRandomMatrix(int matrix[rowCount][colCount]) {
     for (int i = 0; i < rowCount; i++) {
         for (int j = 0; j < colCount; j++) {
-            a[i][j] = Low + rand() % (High - Low + 1);
+            matrix[i][j] = Low + rand() % (High - Low + 1);
         }
     }
 }
 
-void Print(int** a, const int rowCount, const int colCount)
-{
-    cout << endl;
+
+void printMatrix(const int matrix[rowCount][colCount], const char* title) {
+    cout << title << ":\n";
     for (int i = 0; i < rowCount; i++) {
         for (int j = 0; j < colCount; j++) {
-            cout << setw(4) << a[i][j];
+            cout << setw(5) << matrix[i][j];
         }
-        cout << endl;
+        cout << "\n";
     }
-    cout << endl;
+    cout << "\n";
 }
 
-void Change(int** a, const int row1, const int row2, const int colCount)
-{
-    int tmp;
-    for (int j = 0; j < colCount; j++) {
-        tmp = a[row1][j];
-        a[row1][j] = a[row2][j];
-        a[row2][j] = tmp;
-    }
+
+bool meetsCriterion(int value) {
+    return !(value > 0 && value % 2 == 0);
 }
 
-void Sort(int** a, const int rowCount, const int colCount)
-{
-    for (int i0 = 0; i0 < rowCount - 1; i0++) {
-        for (int i1 = 0; i1 < rowCount - i0 - 1; i1++) {
-            if (
-                (a[i1][0] > a[i1 + 1][0]) ||
-                (a[i1][0] == a[i1 + 1][0] && a[i1][1] > a[i1 + 1][1]) ||
-                (a[i1][0] == a[i1 + 1][0] && a[i1][1] == a[i1 + 1][1] && a[i1][2] > a[i1 + 1][2])
-               ) {
-                   Change(a, i1, i1 + 1, colCount);
-               }
-        }
-    }
-}
 
-void Calc(int** a, const int rowCount, const int colCount, int& S, int& k)
-{
-    S = 0;
-    k = 0;
+int countElementsMeetingCriterion(const int matrix[rowCount][colCount]) {
+    int count = 0;
     for (int i = 0; i < rowCount; i++) {
         for (int j = 0; j < colCount; j++) {
-            if ((a[i][j] % 6 == 0) && ((i + j) % 5 != 0)){
-                S += a[i][j];
-                k++;
-                a[i][j] = 0;
+            if (meetsCriterion(matrix[i][j])) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+
+int sumElementsMeetingCriterion(const int matrix[rowCount][colCount]) {
+    cout << matrix << endl;
+    int sum = 0;
+    for (int i = 0; i < rowCount; i++) {
+        for (int j = 0; j < colCount; j++) {
+            if (meetsCriterion(matrix[i][j])) {
+                sum += matrix[i][j];
+            }
+        }
+    }
+    return sum;
+}
+
+
+void replaceElementsMeetingCriterionWithZeros(int matrix[rowCount][colCount]) {
+    for (int i = 0; i < rowCount; i++) {
+        for (int j = 0; j < colCount; j++) {
+            if (!meetsCriterion(matrix[i][j])) {
+                matrix[i][j] = 0;
             }
         }
     }
 }
+
+
+void changeMatrixColumns(int matrix[rowCount][colCount], int col1, int col2) {
+    for (int i = 0; i < rowCount; i++) {
+        int tmp = matrix[i][col1];
+        matrix[i][col1] = matrix[i][col2];
+        matrix[i][col2] = tmp;
+    }
+}
+
+
+void sortMatrix(int matrix[rowCount][colCount]) {
+    for (int i = 0; i < colCount - 1; i++) {
+        for (int j = 0; j < colCount - i - 1; j++) {
+            bool swapNeeded = false;
+
+            if (matrix[0][j] > matrix[0][j + 1]) {
+                swapNeeded = true;
+            } else if (matrix[0][j] == matrix[0][j + 1]) {
+                if (matrix[1][j] < matrix[1][j + 1]) {
+                    swapNeeded = true;
+                } else if (matrix[1][j] == matrix[1][j + 1]) {
+                    if (matrix[2][j] > matrix[2][j + 1]) {
+                        swapNeeded = true;
+                    }
+                }
+            }
+
+            if (swapNeeded) {
+                changeMatrixColumns(matrix, j, j + 1);
+            }
+        }
+    }
+}
+
+
+void copyMatrix(const int source[rowCount][colCount], int destination[rowCount][colCount]) {
+    for (int i = 0; i < rowCount; i++) {
+        for (int j = 0; j < colCount; j++) {
+            destination[i][j] = source[i][j];
+        }
+    }
+}
+
+
